@@ -23,18 +23,13 @@ const FloatingHearts = () => {
   ];
 
   const createHeart = useCallback(() => {
-    const centerX = window.innerWidth / 2;
-    const spread = 300; // Hearts appear in a 300px radius around center
-    const angle = Math.random() * Math.PI * 2;
-    const distance = Math.random() * spread;
-    
     const newHeart: HeartData = {
       id: Date.now() + Math.random(),
-      x: centerX + Math.cos(angle) * distance - 30,
-      y: window.innerHeight, // Start from bottom
-      size: Math.random() * 15 + 15, // 15-30px
+      x: Math.random() * (window.innerWidth - 60),
+      y: Math.random() * (window.innerHeight - 60),
+      size: Math.random() * 20 + 20, // 20-40px
       color: heartColors[Math.floor(Math.random() * heartColors.length)],
-      speed: Math.random() * 3 + 5, // 5-8 seconds to float up
+      speed: Math.random() * 2 + 3, // 3-5 seconds
     };
     return newHeart;
   }, []);
@@ -43,19 +38,19 @@ const FloatingHearts = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setHearts(prev => {
-        // Keep only last 6 hearts to prevent performance issues
-        const newHearts = prev.length >= 6 ? prev.slice(1) : prev;
+        // Keep only last 8 hearts to prevent performance issues
+        const newHearts = prev.length >= 8 ? prev.slice(1) : prev;
         return [...newHearts, createHeart()];
       });
-    }, 2000); // New heart every 2 seconds
+    }, 1500); // New heart every 1.5 seconds
 
     return () => clearInterval(interval);
   }, [createHeart]);
 
-  // Remove hearts after 10 seconds (they float up and disappear)
+  // Remove hearts after 8 seconds if not clicked
   useEffect(() => {
     const cleanup = setInterval(() => {
-      setHearts(prev => prev.filter(heart => Date.now() - heart.id < 10000));
+      setHearts(prev => prev.filter(heart => Date.now() - heart.id < 8000));
     }, 1000);
 
     return () => clearInterval(cleanup);
@@ -83,7 +78,7 @@ const FloatingHearts = () => {
       {hearts.map((heart) => (
         <div
           key={heart.id}
-          className={`heart-float heart-glow pointer-events-none ${
+          className={`heart-float heart-glow pointer-events-auto cursor-pointer transition-all duration-300 hover:scale-110 ${
             burstingHearts.has(heart.id) ? 'heart-burst' : ''
           }`}
           style={{
@@ -91,6 +86,7 @@ const FloatingHearts = () => {
             top: `${heart.y}px`,
             animationDuration: `${heart.speed}s`,
           }}
+          onClick={(e) => handleHeartClick(heart.id, e)}
         >
           <Heart 
             size={heart.size} 
