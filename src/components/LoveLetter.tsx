@@ -1,8 +1,30 @@
 import { Card } from "@/components/ui/card";
+import { useState } from "react";
+import HeartExplosion from "./HeartExplosion";
 
-const LoveLetter = () => {
+interface LoveLetterProps {
+  onExplode?: () => void;
+}
+
+const LoveLetter = ({ onExplode }: LoveLetterProps) => {
+  const [isExploding, setIsExploding] = useState(false);
+
+  const handleClick = () => {
+    if (!isExploding) {
+      setIsExploding(true);
+      onExplode?.();
+    }
+  };
+
+  const handleExplosionComplete = () => {
+    setIsExploding(false);
+  };
+
   return (
-    <Card className="love-letter max-w-2xl mx-auto p-8 border-2 border-primary/20 rounded-xl relative">
+    <Card 
+      className="love-letter max-w-2xl mx-auto p-8 border-2 border-primary/20 rounded-xl relative cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl" 
+      onClick={handleClick}
+    >
       <div className="absolute top-4 right-4 text-primary text-2xl">💕</div>
       <div className="letter-content">
         <h2 className="text-3xl font-bold text-primary mb-6 text-center">
@@ -41,6 +63,11 @@ const LoveLetter = () => {
       <div className="absolute -bottom-2 -right-2 text-primary text-3xl opacity-60">
         💌
       </div>
+      
+      <HeartExplosion 
+        isExploding={isExploding} 
+        onComplete={handleExplosionComplete} 
+      />
     </Card>
   );
 };
